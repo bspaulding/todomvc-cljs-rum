@@ -12,6 +12,7 @@
     :new-todo/description ""}))
 
 ;; selectors
+
 (defn new-todo-description [state]
   (:new-todo/description state))
 (defn visibleTodos [state]
@@ -21,6 +22,7 @@
     "remaining" (remove :completed (:todos state))))
 
 ;; actions
+
 (defn updateNewTodoDescription [text]
   (swap! state assoc :new-todo/description text))
 (defn updateTodoDescription [i text]
@@ -74,6 +76,8 @@
            {:description (:description todo)
             :completed (:completed todo)
             :editing (not (:editing todo))})))
+
+;; components
 
 (rum/defc input [description onChange onAdd]
   [:div
@@ -129,7 +133,7 @@
   [:section.main
    [:input.toggle-all
     {:type "checkbox"
-     :checked (every? :completed (:todos state))}]
+     :checked (and (not (empty? (:todos state))) (every? :completed (:todos state)))}]
    [:label
     {:for "toggle-all"
      :on-click toggleAllCompleted}
