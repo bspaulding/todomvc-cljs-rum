@@ -1,20 +1,18 @@
 (ns cljs-todos.core
   (:require [rum.core :as rum]))
 
-(enable-console-print!)
-
 (defonce state
   (atom
    {:todos [{:description "Get Bread" :completed false}
             {:description "Call Phil" :completed false}
             {:description "i am done" :completed true}]
     :visibility "all"
-    :new-todo/description ""}))
+    :new-todo-description ""}))
 
 ;; selectors
 
 (defn new-todo-description [state]
-  (:new-todo/description state))
+  (:new-todo-description state))
 (defn visibleTodos [state]
   (case (:visibility state)
     "all" (:todos state)
@@ -24,7 +22,7 @@
 ;; actions
 
 (defn updateNewTodoDescription [text]
-  (swap! state assoc :new-todo/description text))
+  (swap! state assoc :new-todo-description text))
 (defn updateTodoDescription [i text]
   (swap! state assoc-in [:todos i :description] text))
 
@@ -32,7 +30,7 @@
   (swap! state update-in [:todos]
          (fn [todos]
            (conj todos {:description (new-todo-description @state)})))
-  (swap! state assoc :new-todo/description ""))
+  (swap! state assoc :new-todo-description ""))
 
 (defn toggleTodoCompleted [i]
   (swap! state update-in [:todos i]
@@ -159,13 +157,18 @@
 (defn render
   ([key ref previousState state] (render state))
   ([state]
-   (print state)
    (rum/mount
     (app state)
     (. js/document (getElementById "app")))))
 
-(add-watch state :rerender render)
-(render @state)
+(defn updateLocalStorage [key ref previousState state]
+	(js/localStorage.setItem "state" (js/JSON.stringify (clj->js state))))
 
-(defn on-js-reload []
-  (render @state))
+;; reset state to saved state if exists
+(let [savedState (js->clj (js/JSON.parse (js/localStorage.getItem "state")) :keywordize-keys true)]
+	(if savedState  (reset! state savedState)))
+
+(add-watch state :rerender render)
+(add-watch state :localstorage updateLocalStorage)
+(render @state)
+(defn on-js-reload [] (render @state))
