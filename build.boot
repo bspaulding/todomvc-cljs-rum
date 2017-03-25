@@ -23,7 +23,7 @@
   "Launch Immediate Feedback Dev Env"
   []
   (comp
-    (serve :dir "target")
+    (serve :dir "target" :httpkit true)
     (watch)
     (reload)
     (cljs-repl)
