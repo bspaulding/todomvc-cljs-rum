@@ -1,0 +1,2 @@
+{:require [cljs-todos.core]
+ :compiler-options {:asset-path "js/main.out"}}
