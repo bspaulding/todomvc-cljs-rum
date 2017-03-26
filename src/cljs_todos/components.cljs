@@ -8,11 +8,9 @@
                                         updateTodoDescription
                                         clearCompletedTodos
                                         toggleAllCompleted
-                                        showAllTodos
-                                        showRemainingTodos
-                                        showCompletedTodos
                                         updateNewTodoDescription
-                                        addTodo]]))
+                                        addTodo]]
+						[secretary.core :as secretary]))
 
 (rum/defc input [description onChange onAdd]
   [:div
@@ -53,16 +51,22 @@
 (rum/defc clear-button []
   [:button.clear-completed {:on-click clearCompletedTodos} "Clear Completed"])
 
-(rum/defc filter-option [text selected onClick]
-  [:li
-   [:a {:class (if selected "selected")
-        :on-click onClick} text]])
+(rum/defc link [attrs href children]
+	[:a (merge attrs {:href href
+										:on-click (fn [e]
+																(. e preventDefault)
+																(js/history.pushState {} "todos" href)
+																(secretary/dispatch! href))})
+	 children])
 
-(rum/defc filter-options [visibility showAllTodos showRemainingTodos showCompletedTodos]
+(rum/defc filter-option [text selected href]
+  [:li (link {:class (if selected "selected")} href text)])
+
+(rum/defc filter-options [visibility]
   [:ul.filters
-   (filter-option "All" (= visibility "all") showAllTodos)
-   (filter-option "Remaining" (= visibility "remaining") showRemainingTodos)
-   (filter-option "Completed" (= visibility "completed") showCompletedTodos)])
+   (filter-option "All" (= visibility "all") "/")
+   (filter-option "Remaining" (= visibility "remaining") "/remaining")
+   (filter-option "Completed" (= visibility "completed") "/completed")])
 
 (rum/defc main [state]
   [:section.main
@@ -82,7 +86,7 @@
     " "
     (if (= 1 (count (remove :completed (:todos state)))) "item" "items")
     " left"]
-   (filter-options (:visibility state) showAllTodos showRemainingTodos showCompletedTodos)
+   (filter-options (:visibility state))
    (clear-button)])
 
 (rum/defc app [state]

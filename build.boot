@@ -12,7 +12,9 @@
                  [com.cemerick/piggieback "0.2.1" :scope "test"] ;; needed by bREPL
                  ;; needed by bREPL
                  [weasel "0.7.0" :scope "test"]
-                 [rum "0.10.8"]])
+                 ;; app dependencies
+                 [rum "0.10.8"]
+                 [secretary "1.2.3"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]

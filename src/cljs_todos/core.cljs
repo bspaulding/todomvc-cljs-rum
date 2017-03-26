@@ -1,7 +1,8 @@
 (ns cljs-todos.core
   (:require [rum.core :as rum]
 						[cljs-todos.actions :refer [state]]
-						[cljs-todos.components :refer [app]]))
+						[cljs-todos.components :refer [app]]
+						[cljs-todos.routes]))
 
 (defn render
   ([key ref previousState state] (render state))
