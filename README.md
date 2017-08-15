@@ -1,39 +1,29 @@
-# cljs-todos
+# todomvc-cljs-rum
 
-FIXME: Write a one-line description of your library/project.
+Implementing TodoMVC in cljs with rum
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+Just learning / playing with cljs here. Trying to be as "vanilla" as possible.
 
 ## Setup
 
 To get an interactive development environment run:
 
-    lein figwheel
+    boot dev
 
-and open your browser at [localhost:3449](http://localhost:3449/).
+and open your browser at [localhost:3000](http://localhost:3000/).
 This will auto compile and send all changes to the browser without the
-need to reload. After the compilation process is complete, you will
-get a Browser Connected REPL. An easy way to try it is:
+need to reload.
 
+After the compilation process is complete, you can connect to the browser repl via:
+
+    boot repl -c
+    (start-repl)
     (js/alert "Am I connected?")
 
 and you should see an alert in the browser window.
 
-To clean all compiled files:
-
-    lein clean
-
-To create a production build run:
-
-    lein do clean, cljsbuild once min
-
-And open your browser in `resources/public/index.html`. You will not
-get live reloading, nor a REPL. 
-
 ## License
 
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
+Copyright © 2017 UNLICENSED
