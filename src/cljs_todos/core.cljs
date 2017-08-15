@@ -1,14 +1,15 @@
 (ns cljs-todos.core
   (:require [rum.core :as rum]
-						[cljs-todos.actions :refer [state]]
+						[cljs-todos.actions :refer [state boundActions]]
 						[cljs-todos.components :refer [app]]
-						[cljs-todos.routes]))
+						[cljs-todos.routes]
+						[nightlight.repl-server]))
 
 (defn render
   ([key ref previousState state] (render state))
   ([state]
    (rum/mount
-    (app state)
+    (app state boundActions)
     (. js/document (getElementById "app")))))
 
 (defn updateLocalStorage [key ref previousState state]

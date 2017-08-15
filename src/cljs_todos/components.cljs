@@ -1,15 +1,6 @@
 (ns cljs-todos.components
   (:require [rum.core :as rum]
             [cljs-todos.selectors :refer [new-todo-description visibleTodos]]
-            [cljs-todos.actions :refer [toggleTodoCompleted
-                                        toggleEditing
-                                        removeTodo
-                                        toggleEditing
-                                        updateTodoDescription
-                                        clearCompletedTodos
-                                        toggleAllCompleted
-                                        updateNewTodoDescription
-                                        addTodo]]
 						[secretary.core :as secretary]))
 
 (rum/defc input [description onChange onAdd]
@@ -29,26 +20,31 @@
    [:h1 text]
    (input description updateNewTodoDescription addTodo)])
 
-(rum/defc todo-item < {:key-fn (fn [i] i)} [index todo]
-  [:li {:class (if (:completed todo) "completed" (if (:editing todo) "editing"))}
-   [:div.view
-    [:input.toggle {:type "checkbox" :checked (:completed todo)
-                    :on-click (fn [] (toggleTodoCompleted index))}]
-    [:label {:on-double-click (fn [] (toggleEditing index))} (:description todo)]
-    [:button.destroy {:on-click (fn [e] (.preventDefault e) (.stopPropagation e) (removeTodo index))}]]
-   [:input.edit {:value (:description todo)
-                 :on-key-up
-                 (fn [event]
-                   (if (= 13 (.-keyCode event))
-                     (toggleEditing index)))
-                 :on-input
-                 (fn [event] (updateTodoDescription index (.. event -target -value)))}]])
+(rum/defc todo-item < {:key-fn (fn [i] i)}
+	[index todo actions]
+	(let [{:keys [toggle-todo-completed
+								toggle-editing
+								remove-todo
+								update-todo-description]} actions]
+		[:li {:class (if (:completed todo) "completed" (if (:editing todo) "editing"))}
+		 [:div.view
+			[:input.toggle {:type "checkbox" :checked (:completed todo)
+											:on-click (fn [] (toggle-todo-completed index))}]
+			[:label {:on-double-click (fn [] (toggle-editing index))} (:description todo)]
+			[:button.destroy {:on-click (fn [e] (.preventDefault e) (.stopPropagation e) (remove-todo index))}]]
+		 [:input.edit {:value (:description todo)
+									 :on-key-up
+									 (fn [event]
+										 (if (= 13 (.-keyCode event))
+											 (toggle-editing index)))
+									 :on-input
+									 (fn [event] (update-todo-description index (.. event -target -value)))}]]))
 
-(rum/defc todos-list [todos]
+(rum/defc todos-list [todos actions]
   [:ul.todo-list
-   (map-indexed todo-item todos)])
+   (map-indexed #(todo-item %1 %2 actions) todos)])
 
-(rum/defc clear-button []
+(rum/defc clear-button [clearCompletedTodos]
   [:button.clear-completed {:on-click clearCompletedTodos} "Clear Completed"])
 
 (rum/defc link [attrs href children]
@@ -68,18 +64,18 @@
    (filter-option "Remaining" (= visibility "remaining") "/remaining")
    (filter-option "Completed" (= visibility "completed") "/completed")])
 
-(rum/defc main [state]
+(rum/defc main [state actions]
   [:section.main
    [:input.toggle-all
     {:type "checkbox"
      :checked (and (not (empty? (:todos state))) (every? :completed (:todos state)))}]
    [:label
     {:for "toggle-all"
-     :on-click toggleAllCompleted}
+     :on-click (:toggle-all-completed actions)}
     "Mark all as complete"]
-   (todos-list (visibleTodos state))])
+   (todos-list (visibleTodos state) actions)])
 
-(rum/defc footer [state]
+(rum/defc footer [state clear-completed-todos]
   [:footer.footer
    [:span.todo-count
     [:strong (count (remove :completed (:todos state)))]
@@ -87,11 +83,11 @@
     (if (= 1 (count (remove :completed (:todos state)))) "item" "items")
     " left"]
    (filter-options (:visibility state))
-   (clear-button)])
+   (clear-button clear-completed-todos)])
 
-(rum/defc app [state]
+(rum/defc app [state actions]
   [:div
-   (header "todos" (new-todo-description state) updateNewTodoDescription addTodo)
-   (main state)
-   (footer state)])
+   (header "todos" (new-todo-description state) (:update-new-todo-description actions) (:add-todo actions))
+   (main state actions)
+   (footer state (:clear-completed-todos actions))])
 

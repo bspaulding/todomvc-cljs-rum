@@ -2,9 +2,13 @@
 	(:require [secretary.core :as secretary]
 						[goog.events :as events]
 						[goog.history.EventType :as EventType]
-						[cljs-todos.actions :refer [showAllTodos showRemainingTodos showCompletedTodos]])
+						[cljs-todos.actions :refer [boundActions]])
 	(:require-macros [secretary.core :refer [defroute]])
 	(:import goog.History))
+
+(def showAllTodos (:show-all-todos boundActions))
+(def showRemainingTodos (:show-remaining-todos boundActions))
+(def showCompletedTodos (:show-completed-todos boundActions))
 
 (defroute all "/" []
 	(showAllTodos))
