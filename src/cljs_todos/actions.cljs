@@ -14,35 +14,36 @@
 ;; actions
 
 (defn updateNewTodoDescription [state text]
-  (swap! state assoc :new-todo-description text))
+  (assoc state :new-todo-description text))
 (defn updateTodoDescription [state i text]
-  (swap! state assoc-in [:todos i :description] text))
+  (assoc-in state [:todos i :description] text))
 
 (defn addTodo [state]
-  (swap! state update-in [:todos]
-         (fn [todos]
-           (conj todos {:description (new-todo-description @state)})))
-  (swap! state assoc :new-todo-description ""))
+	(-> state
+		(assoc :new-todo-description "")
+		(update-in [:todos]
+					 (fn [todos]
+						 (conj todos {:description (new-todo-description state)})))))
 
 (defn toggleTodoCompleted [state i]
-  (swap! state update-in [:todos i]
+  (update-in state [:todos i]
          (fn [todo]
            {:description (:description todo)
             :completed (not (:completed todo))})))
 
 (defn clearCompletedTodos [state]
-  (swap! state update-in [:todos]
+  (update-in state [:todos]
          (fn [todos]
            (into [] (remove :completed todos)))))
 
 (defn showAllTodos [state]
-  (swap! state assoc :visibility "all"))
+  (assoc state :visibility "all"))
 
 (defn showRemainingTodos [state]
-  (swap! state assoc :visibility "remaining"))
+  (assoc state :visibility "remaining"))
 
 (defn showCompletedTodos [state]
-  (swap! state assoc :visibility "completed"))
+  (assoc state :visibility "completed"))
 
 (defn mark-completed [completed]
   (fn [todo]
@@ -50,18 +51,18 @@
      :completed completed}))
 
 (defn toggleAllCompleted [state]
-  (let [all-completed (every? :completed (:todos @state))]
-    (swap! state update-in [:todos]
+  (let [all-completed (every? :completed (:todos state))]
+    (update-in state [:todos]
            (fn [todos]
              (into [] (map (mark-completed (not all-completed)) todos))))))
 
 (defn removeTodo [state i]
-  (swap! state update-in [:todos]
+  (update-in state [:todos]
          (fn [todos]
            (into [] (concat (take i todos) (drop (+ 1 i) todos))))))
 
 (defn toggleEditing [state i]
-  (swap! state update-in [:todos i]
+  (update-in state [:todos i]
          (fn [todo]
            {:description (:description todo)
             :completed (:completed todo)
@@ -84,7 +85,11 @@
 	 :show-completed-todos showCompletedTodos})
 
 (defn bindActions [atom actions]
-  (into {} (map (fn [[k f]] {k (partial f atom)}) actions)))
+  (into {}
+				(map (fn [[k f]]
+							 {k (fn [& args]
+										(swap! atom (fn [state] (apply f state args))))})
+						 actions)))
 
 (def boundActions (bindActions state actions))
 
