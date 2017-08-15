@@ -15,13 +15,27 @@
                  [rum "0.10.8"]
                  [secretary "1.2.3"]
 								 [binaryage/devtools "0.9.4" :scope "test"]
-								 [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]])
+								 [powerlaces/boot-cljs-devtools "0.2.0" :scope "test"]
+								 [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]])
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[pandeiro.boot-http :refer [serve]]
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
-				 '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]])
+         '[powerlaces.boot-cljs-devtools :refer [cljs-devtools]]
+         '[crisptrutski.boot-cljs-test :refer [test-cljs]])
+
+(task-options!
+  test-cljs {:js-env :node})
+
+(deftask testing []
+  (merge-env! :source-paths #{"test"})
+  identity)
+
+(deftask test []
+	(comp
+		(testing)
+		(test-cljs)))
 
 (deftask dev
   "Launch Immediate Feedback Dev Env"
