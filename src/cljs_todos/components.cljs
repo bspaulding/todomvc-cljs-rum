@@ -1,6 +1,6 @@
 (ns cljs-todos.components
   (:require [rum.core :as rum]
-            [cljs-todos.selectors :refer [new-todo-description visibleTodos]]
+            [cljs-todos.selectors :refer [new-todo-description visibleTodos todos-empty?]]
 						[secretary.core :as secretary]))
 
 (rum/defc input [description onChange onAdd]
@@ -77,6 +77,7 @@
 
 (rum/defc footer [state clear-completed-todos]
   [:footer.footer
+	 {:class (if (todos-empty? state) "hidden" "")}
    [:span.todo-count
     [:strong (count (remove :completed (:todos state)))]
     " "

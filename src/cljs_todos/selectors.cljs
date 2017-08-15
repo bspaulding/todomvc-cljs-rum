@@ -8,3 +8,6 @@
     "all" (:todos state)
     "completed" (filter :completed (:todos state))
     "remaining" (remove :completed (:todos state))))
+
+(defn todos-empty? [state]
+	(= 0 (count (:todos state))))
