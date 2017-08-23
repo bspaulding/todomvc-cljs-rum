@@ -2,11 +2,11 @@
  :source-paths #{"src"}
  :resource-paths #{"resources/public"}
  :dependencies '[[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.473"]
-                 [adzerk/boot-cljs "1.7.228-2"]
+                 [org.clojure/clojurescript "1.9.908"]
+                 [adzerk/boot-cljs "2.1.2"]
                  [pandeiro/boot-http "0.7.6"]
                  [org.clojure/tools.nrepl "0.2.12"] ;; BUG: required by boot-http
-                 [adzerk/boot-reload "0.5.1"]
+                 [adzerk/boot-reload "0.5.2"]
                  [adzerk/boot-cljs-repl "0.3.3"]
                  [com.cemerick/piggieback "0.2.1" :scope "test"] ;; needed by bREPL
                  ;; needed by bREPL
@@ -45,6 +45,7 @@
     (watch)
     (reload)
     (cljs-repl)
-		(cljs-devtools)
-    (cljs :source-map true :optimizations :none)
+    (cljs-devtools)
+    (cljs :source-map true
+          :optimizations :none)
     (target :dir #{"target"})))
