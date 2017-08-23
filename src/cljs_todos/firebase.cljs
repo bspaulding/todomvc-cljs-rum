@@ -23,16 +23,6 @@
 (defonce user (atom nil))
 (add-watch user :user-change-log
   (fn [_ _ _ _] (.log js/console "user changed")))
-(add-watch user :update-listeners
-  (fn [_ _ _ new-user]
-    (let [uid (.-uid new-user)
-          refname (str "users/" uid)]
-      (.on (.ref db refname)
-           "value"
-           (fn [result]
-             (let [js-state (.val result)
-                   state (js->clj js-state :keywordize-keys true)]
-              (.log js/console "firebase state changed:" js-state state)))))))
 
 (defn serialize [state]
   (let [transformed-todos (reduce (fn [m v] (assoc m (count m) v)) {} (:todos state))]
